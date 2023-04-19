@@ -21,7 +21,7 @@ const AuthProvider = ({children}) => {
     }
 
     const updateUser = (userInfo)=> {
-        return updateProfile(user, userInfo)
+        return updateProfile(auth.currentUser, userInfo)
     }
 
     const logOutUser = () => {
@@ -31,7 +31,7 @@ const AuthProvider = ({children}) => {
 
     useEffect(()=> {
         const unSubscribed = onAuthStateChanged(auth, currentUser => {
-            console.log('user observing', currentUser);
+            console.log('user observing');
             setUser(currentUser);
             setLoading(false);
         })

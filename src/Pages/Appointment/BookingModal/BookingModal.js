@@ -1,47 +1,76 @@
 import { format } from 'date-fns';
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
+import {AuthContext} from '../../../Contexts/AuthProvider'
 
-const BookingModal = ({treatment, selectedDate}) => {
+
+const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
+    const { name: treatmentName, slots } = treatment;
     const date = format(selectedDate, 'PP');
-    const [formData, setFormData] = useState({});
-    const handleSubmit = (event) => {
-        const form = event.target.parentElement.parentElement;
-        form.reset();
-        console.log(form, formData)
-    }      
-    const handleOnBlur = (event) => {
-        const field = event.target.name;
-        const value = event.target.value;
-        const newFormData = {...formData};
-        newFormData[field] = value;
-        setFormData(newFormData)
+    const {user} = useContext(AuthContext);
+
+    const handleBooking = event => {
+        event.preventDefault();
+        const form = event.target;
+        const slot = form.slot.value;
+        const name = form.name.value;
+        const email = form.email.value;
+        const phone = form.phone.value;
+        const booking = {
+            appointmentDate: date,
+            treatment: treatmentName,
+            patient: name,
+            slot,
+            email,
+            phone,
+        }
+
+        fetch('http://localhost:5000/bookings',
+        {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify(booking)
+        }
+        )
+        .then(res => res.json())
+        .then(data => {
+            if(data.acknowledged) {
+                alert("Booking Confirmed!!!")
+            }
+            else {
+                alert(data.message)
+            }
+        })
+        
+        
+        setTreatment(null);
     }
+
     return (
-        // ********fix the form submit***********
         <>
             <input type="checkbox" id="booking-modal" className="modal-toggle" />
-            <div className="modal modal-bottom sm:modal-middle">
-            <div className="modal-box">
-                <p className="py-4">{treatment.name}</p>
-
-                <form className='flex flex-col justify-center'>
-                    <input type="text" value={date} disabled  className="input input-secondary w-full my-2 " />
-                    <select  onBlur={handleOnBlur} name="slot"  className="select select-bordered select-secondary w-full ">
-                        {
-                            treatment.slots.map(slot => <option value={slot}>{slot}</option>)
-                        }
-                    </select>
-                    <input required name="name" onBlur={handleOnBlur} type="text"  className="input input-secondary w-full my-2" />
-                    <input required name="email" onBlur={handleOnBlur} type="email"  className="input input-secondary w-full my-2" />
-                    <input required name="phone" onBlur={handleOnBlur} type="text"  className="input input-secondary w-full my-2" />
-
-                    <div className="modal-action">
-                        <label onClick={handleSubmit} htmlFor="booking-modal" className="btn btn-secondary text-white"> Submit</label>
-                    </div>
-                </form>
-
-                
-            </div>
+            <div className="modal">
+                <div className="modal-box relative">
+                    <label htmlFor="booking-modal" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+                    <h3 className="text-lg font-bold">{treatmentName}</h3>
+                    <form onSubmit={handleBooking} className='grid grid-cols-1 gap-3 mt-10'>
+                        <input type="text" disabled value={date} className="input w-full input-bordered " />
+                        <select name="slot" className="select select-bordered w-full">
+                            {
+                                slots.map((slot, i) => <option
+                                    value={slot}
+                                    key={i}
+                                >{slot}</option>)
+                            }
+                        </select>
+                        <input name="name" type="text" defaultValue={user?.displayName} disabled className="input w-full input-bordered" />
+                        <input name="email" type="email" defaultValue={user?.email} disabled  className="input w-full input-bordered" />
+                        <input name="phone" type="text"  className="input w-full input-bordered" />
+                        <br />
+                        <input className='btn btn-accent w-full' type="submit" value="Submit" />
+                    </form>
+                </div>
             </div>
         </>
     );

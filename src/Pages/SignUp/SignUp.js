@@ -1,29 +1,57 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthProvider';
+import useToken from '../../Hooks/useToken';
 
 const SignUp = () => {
     const { register, handleSubmit, } = useForm();
     const {createUser, updateUser} = useContext(AuthContext);
+
+    const [createdUserEmail, setCreatedUserEmail] = useState('')
+    const [token] = useToken(createdUserEmail);
+    console.log("token", token)
+    const navigate = useNavigate();
+
+    if(token) {
+        navigate('/');
+    }
 
     const handleSignUp = (data)=> {
         
         createUser(data.email, data.password)
         .then(result => {
             const user = result.user;
-
-            // const userInfo = {
-            //     displayName : data.name
-            // }
-            // updateUser(userInfo) 
-            // .then(()=>console.log("profile updated"))
-            // .catch(error => console.log(error.message))
+            const userInfo = {
+                displayName : data.name
+            }
+            updateUser(userInfo) 
+            .then(()=>{
+                saveUser(data.name, data.email)
+            })
+            .catch(error => console.log(error.message))
 
         })
         .catch(error => console.log(error.message))
-       
     }
+
+    const saveUser = (name, email) => {
+        const user = {name, email};
+        fetch('http://localhost:5000/users',
+        {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify(user)
+        })
+        .then(res => res.json())
+        .then(data => {
+            setCreatedUserEmail(email)            
+        })
+    }
+    
+    
     return (
         <div className='flex justify-center items-center'>
             
