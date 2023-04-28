@@ -10,7 +10,6 @@ const SignUp = () => {
 
     const [createdUserEmail, setCreatedUserEmail] = useState('')
     const [token] = useToken(createdUserEmail);
-    console.log("token", token)
     const navigate = useNavigate();
 
     if(token) {
