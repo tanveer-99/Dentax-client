@@ -4,7 +4,7 @@ import {AuthContext} from '../../../Contexts/AuthProvider'
 
 
 const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
-    const { name: treatmentName, slots } = treatment;
+    const { name: treatmentName, slots, price } = treatment;
     const date = format(selectedDate, 'PP');
     const {user} = useContext(AuthContext);
 
@@ -22,9 +22,10 @@ const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
             slot,
             email,
             phone,
+            price
         }
 
-        fetch('http://localhost:5000/bookings',
+        fetch('https://dentax-server-deploy.onrender.com/bookings',
         {
             method: 'POST',
             headers: {

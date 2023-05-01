@@ -9,7 +9,7 @@ const AddADoctor = () => {
     const { data: specialties, isLoading} = useQuery({
         queryKey: ['specialty'],
         queryFn: async ()=> {
-            const res = await fetch('http://localhost:5000/appointmentspecialty');
+            const res = await fetch('https://dentax-server-deploy.onrender.com/appointmentspecialty');
             const data = await res.json();
             return data;
         }
@@ -35,7 +35,7 @@ const AddADoctor = () => {
 
                 console.log(doctorInfo)
 
-                fetch('http://localhost:5000/doctors', {
+                fetch('https://dentax-server-deploy.onrender.com/doctors', {
                     method: 'POST',
                     headers: {
                         'content-type': 'application/json',

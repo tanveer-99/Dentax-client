@@ -13,10 +13,13 @@ import AllUsers from "../Pages/Dashboard/AllUsers/AllUsers";
 import AdminRoute from "./AdminRoute/AdminRoute";
 import AddADoctor from "../Pages/Dashboard/AddADoctor/AddADoctor";
 import ManageDoctors from "../Pages/Dashboard/ManageDoctors/ManageDoctors";
+import Payment from "../Pages/Dashboard/Payment/Payment";
+import DisplayError from "../Pages/Shared/DisplayError/DisplayError";
 
 const router = createBrowserRouter([
     {
         path: '/',
+        errorElement: <DisplayError></DisplayError>,
         element: <Main></Main>,
         children: [
             {
@@ -44,6 +47,7 @@ const router = createBrowserRouter([
     {
         path: '/dashboard',
         element: <PrivateRoute><DashboardLayout></DashboardLayout></PrivateRoute>,
+        errorElement: <DisplayError></DisplayError>,
         children: [
             {
                 path: '/dashboard',
@@ -60,6 +64,12 @@ const router = createBrowserRouter([
             {
                 path: '/dashboard/managedoctors',
                 element: <AdminRoute><ManageDoctors></ManageDoctors></AdminRoute>
+            },
+            {
+                path: '/dashboard/payment/:id',
+                element: <Payment></Payment>,
+                loader: ({params}) => fetch(`https://dentax-server-deploy.onrender.com/bookings/${params.id}`)
+                
             }
         ]
     }

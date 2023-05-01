@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import { AuthContext } from '../../../Contexts/AuthProvider';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 
 const MyAppointments = () => {
     const {user} = useContext(AuthContext);
 
-    const url = `http://localhost:5000/bookings?email=${user?.email}`;
+    const url = `https://dentax-server-deploy.onrender.com/bookings?email=${user?.email}`;
     
     const { data : bookings = []} = useQuery({
         queryKey: ['bookings', user?.email],
@@ -32,6 +33,7 @@ const MyAppointments = () => {
                         <th>Treatment</th>
                         <th>Date</th>
                         <th>Time</th>
+                        <th>Payment</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -43,6 +45,20 @@ const MyAppointments = () => {
                             <td>{booking.treatment}</td>
                             <td>{booking.appointmentDate}</td>
                             <td>{booking.slot}</td>
+                            <td>
+                                {
+                                    booking.price && !booking.paid &&
+                                    <Link to={`/dashboard/payment/${booking._id}`}>
+                                        <button className="btn btn-primary">
+                                            Pay
+                                        </button>
+                                    </Link>
+                                }
+                                {
+                                    booking.price && booking.paid &&
+                                    <span className='text-green-900'>Paid</span>
+                                }
+                            </td>
                         </tr>
                         )
                     }
